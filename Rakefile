@@ -1,11 +1,14 @@
 require "bundler"
 require_relative 'slack_relay'
+require_relative 'slack_relay_server'
 
 task :default => :version
 
 desc "run the shit"
 task :run do
-	SlackRelay.client.run!  # start EventMachine loop
+	EventMachine.run {
+	  EventMachine.start_server '127.0.0.1', ENV['PORT'], SlackRelayServer
+	}
 end
 
 desc "shows the shit version"

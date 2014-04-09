@@ -50,4 +50,10 @@ class SlackRelay
       end
     end
   end
+
+  def self.server
+    EventMachine.run {
+      EventMachine.start_server '127.0.0.1', ENV['PORT'], Echo
+    }
+  end
 end
