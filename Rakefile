@@ -7,6 +7,7 @@ task :default => :version
 desc "run the shit"
 task :run do
 	EventMachine.run {
+    SlackRelay.client.run!  # start EventMachine loop
 	  EventMachine.start_server '127.0.0.1', ENV['PORT'], SlackRelayServer
 	}
 end

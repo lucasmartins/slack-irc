@@ -6,3 +6,4 @@ export IRC_SERVER=irc.freenode.net
 export IRC_PORT=6667
 export IRC_ACCOUNT=
 export IRC_CHANNEL=
+export PORT=

@@ -1,4 +1,6 @@
 require 'em-irc'
+require 'json'
+require 'typhoeus'
 require 'logger'
 
 REQUIRED_VARS=[
@@ -15,11 +17,18 @@ REQUIRED_VARS.each do |v|
   raise "You MUST export this environment variable: #{v}" unless ENV[v]
 end
 
+ENV['SLACK_CHANNEL']="##{ENV['SLACK_CHANNEL']}" unless ENV['SLACK_CHANNEL'].start_with?('#')
+
 class SlackRelay
-  # Tiphoeus here?
   def self.push(source, target, message)
     message=" #{message}" if message.start_with?(':')
-    `curl -X POST --data-urlencode 'payload={"channel": "##{ENV['SLACK_CHANNEL']}", "username": "[IRC] #{source}", "text": "#{message}", "icon_emoji": ":ghost:"}' https://#{ENV['SLACK_ACCOUNT']}.slack.com/services/hooks/incoming-webhook?token=#{ENV['SLACK_TOKEN']} -s`
+    request = Typhoeus::Request.new("https://#{ENV['SLACK_ACCOUNT']}.slack.com/services/hooks/incoming-webhook?token=#{ENV['SLACK_TOKEN']}",
+      method: :post,
+      #body: "this is a request body",
+      body: {'payload'=>{"channel"=>ENV['SLACK_CHANNEL'], "username"=> "[IRC] #{source}", "text"=> message, "icon_emoji"=>":ghost:" }.to_json},
+      headers: { Accept: "application/json" }
+    )
+    request.run
   end
 
   def self.client
